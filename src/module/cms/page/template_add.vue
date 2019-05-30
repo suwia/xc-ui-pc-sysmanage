@@ -11,40 +11,21 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="选择模版" prop="templateId">
-        <el-select v-model="pageForm.templateId" placeholder="请选择">
+      <el-form-item label="模版文件" prop="templateFileId">
+        <el-select v-model="pageForm.templateFileId" placeholder="请选择">
           <el-option
-            v-for="item in templateList"
-            :key="item.templateId"
+            v-for="item in templateFileList"
+            :key="item.templateFileId"
             :label="item.templateName"
-            :value="item.templateId">
+            :value="item.templateFileId">
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="页面名称" prop="pageName">
-        <el-input v-model="pageForm.pageName" auto-complete="off"></el-input>
+      <el-form-item label="模板名称" prop="templateName">
+        <el-input v-model="pageForm.templateName" auto-complete="off"></el-input>
       </el-form-item>
-      <el-form-item label="别名" prop="pageAliase">
-        <el-input v-model="pageForm.pageAliase" auto-complete="off"></el-input>
-      </el-form-item>
-      <el-form-item label="访问路径" prop="pageWebPath">
-        <el-input v-model="pageForm.pageWebPath" auto-complete="off"></el-input>
-      </el-form-item>
-      <el-form-item label="物理路径" prop="pagePhysicalPath">
-        <el-input v-model="pageForm.pagePhysicalPath" auto-complete="off"></el-input>
-      </el-form-item>
-      <el-form-item label="数据URL" prop="dataUrl">
-        <el-input v-model="pageForm.dataUrl" auto-complete="off"></el-input>
-      </el-form-item>
-      <el-form-item label="类型">
-        <el-radio-group v-model="pageForm.pageType">
-          <el-radio class="radio" label="0">静态</el-radio>
-          <el-radio class="radio" label="1">动态</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker type="datetime" placeholder="创建时间" v-model="pageForm.pageCreateTime">
-        </el-date-picker>
+      <el-form-item label="模板参数" prop="templateParameter">
+        <el-input v-model="pageForm.templateParameter" auto-complete="off"></el-input>
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -62,57 +43,54 @@
         //站点列表
         siteList:[],
         //模版列表
-        templateList:[],
+        templateFileList:[],
         //新增界面数据
         pageForm: {
           siteId:'',
-          templateId:'',
-          pageName: '',
-          pageAliase: '',
-          pageWebPath: '',
-          pageParameter:'',
-          pagePhysicalPath:'',
-          dataUrl:'',
-          pageType:'',
-          pageCreateTime: new Date()
+          templateName:'',
+          templateParameter: '',
+          templateFileId: ''
         },
 
+
+        //校验规则
         pageFormRules: {
           siteId:[
             {required: true, message: '请选择站点', trigger: 'blur'}
           ],
-          templateId:[
-            {required: true, message: '请选择模版', trigger: 'blur'}
+          templateFileId:[
+            {required: true, message: '请选择模版文件', trigger: 'blur'}
           ],
-          pageName: [
-            {required: true, message: '请输入页面名称', trigger: 'blur'}
+          templateName: [
+            {required: true, message: '请输入模板名称', trigger: 'blur'}
           ],
-          pageWebPath: [
-            {required: true, message: '请输入访问路径', trigger: 'blur'}
-          ],
-          pagePhysicalPath: [
-            {required: true, message: '请输入物理路径', trigger: 'blur'}
-          ],
-          dataUrl: [
-            {required: true, message: '请输入数据URL地址', trigger: 'blur'}
+          templateParameter: [
+            {required: true, message: '请输入模板参数', trigger: 'blur'}
           ]
         }
 
       }
     },
     methods:{
+
+      //提交
       addSubmit(){
+
+        //对表单进行校验，校验通过才提交表单信息
         this.$refs['pageForm'].validate((valid) => {
           if (valid) {
 
+            //表单提交确认框
             this.$confirm('确认提交该页面?', '提示', {}).then(() => {
 
-              cmsApi.page_add(this.pageForm).then((res) => {
+              cmsApi.template_add(this.pageForm).then((res) => {
                 if (res.success) {
                   this.$message({
                     type: 'success',
                     message: '提交成功!'
                   });
+
+                  //提交成功重置表单域
                   this.$refs['pageForm'].resetFields();
                 } else if (res.message) {
                   this.$message.error(res.message);
@@ -131,7 +109,7 @@
 
       go_back(){
         this.$router.push({
-          path: '/cms/page/list', query: {
+          path: '/cms/template/list', query: {
             page: this.$route.query.page,
             siteId:this.$route.query.siteId
           }
@@ -153,14 +131,14 @@
         }
       ]
       //模板列表
-      this.templateList = [
+      this.templateFileList = [
         {
-          templateId: '5a962b52b00ffc514038faf7',
-          templateName: '首页'
+          templateFileId: '5a795bbcdd573c04508f3a59',
+          templateName: 'index_banner.html'
         },
         {
-          templateId: '5a962bf8b00ffc514038fafa',
-          templateName: '轮播图'
+          templateFileId: '5a7b9fa5d019f14224087d64',
+          templateName: 'test.html'
         }
       ]
     },

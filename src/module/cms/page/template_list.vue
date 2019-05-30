@@ -11,43 +11,34 @@
           :value="item.siteId">
         </el-option>
       </el-select>
-      页面别名：
-      <el-input v-model="param.pageAliase" style="width: 100px"></el-input>
+
+      模板名称：
+      <el-input v-model="param.templateName" style="width: 100px"></el-input>
       <el-button type="primary" size="small" @click="query">查询</el-button>
-      <router-link class="mui-tab-item" :to="{path:'/cms/page/add/',
+      <router-link class="mui-tab-item" :to="{path:'/cms/template/add/',
           query:{
             page: this.param.page,
             siteId: this.param.siteId
           }
         }">
-        <el-button type="primary" size="small">新增页面</el-button>
+        <el-button type="primary" size="small">新增模板</el-button>
       </router-link>
     </el-form>
     <el-table :data="list" stripe style="width: 100%">
       <el-table-column type="index" width="60"></el-table-column>
-      <el-table-column prop="pageName" label="页面名称" width="120"></el-table-column>
-      <el-table-column prop="pageAliase" label="别名" width="120"></el-table-column>
-      <el-table-column prop="pageType" label="页面类型" width="150"></el-table-column>
-      <el-table-column prop="pageWebPath" label="访问路径" width="250"></el-table-column>
-      <el-table-column prop="pagePhysicalPath" label="物理路径" width="250"></el-table-column>
-      <el-table-column prop="pageCreateTime" label="创建时间" width="180"></el-table-column>
-      <el-table-column label="操作" width="480">
+     <!-- <el-table-column prop="templateId" label="模板ID" width="120"></el-table-column>-->
+      <el-table-column prop="templateName" label="模板名称" width="120"></el-table-column>
+      <el-table-column prop="templateParameter" label="模板参数" width="150"></el-table-column>
+      <el-table-column prop="templateFileId" label="模板文件ID" width="250"></el-table-column>
+      <el-table-column label="操作" width="160">
         <template slot-scope="page">
           <el-button
             size="small" type="text"
-            @click="edit(page.row.pageId)">编辑
+            @click="edit(page.row.templateId)">编辑
           </el-button>
           <el-button
             size="small" type="text"
-            @click="del(page.row.pageId)">删除
-          </el-button>
-          <el-button
-            size="small" type="text"
-            @click="preview(page.row.pageId)">页面预览
-          </el-button>
-          <el-button
-            size="small" type="text"
-            @click="postPage(page.row.pageId)">页面发布
+            @click="del(page.row.templateId)">删除
           </el-button>
         </template>
       </el-table-column>
@@ -76,53 +67,27 @@
           page:1,
           size:10,
           siteId:0
-
         },
         total: 0,
         list: [],
         siteList: []
       }
     },
+
     methods:{
-      //页面预览
-      preview:function (pageId) {
-        window.open("http://www.xuecheng.com/cms/preview/"+pageId)
-      },
-
-      //页面发布
-      postPage:function (pageId) {
-        this.$confirm('确认发布吗？', '提示', {}).then(() => {
-          this.addLoading = true;
-          cmsApi.page_postPage(pageId).then((res) => {
-            console.log(res);
-            if(res.success){
-              this.addLoading = false;
-              this.$message({
-                message: '发布成功',
-                type: 'success'
-              });
-
-            }else{
-              this.addLoading = false;
-              this.$message.error('发布失败');
-            }
-          });
-        });
-      },
-
-
       //修改
-      edit:function (pageId) {
-        this.$router.push({ path: '/cms/page/edit/'+pageId,query:{
+      edit:function (templateId) {
+        this.$router.push({ path: '/cms/template/edit/'+templateId,query:{
             page: this.param.page,
             siteId: this.param.siteId}})
       },
+
       //删除
-      del:function (pageId) {
+      del:function (templateId) {
 
         this.$confirm('确认删除吗？', '提示', {}).then(() => {
           this.addLoading = true;
-          cmsApi.page_del(pageId).then((res) => {
+          cmsApi.template_del(templateId).then((res) => {
             console.log(res);
             if(res.success){
               this.addLoading = false;
@@ -141,21 +106,24 @@
         });
       },
 
-      //查询
+      //页面查询
       query:function () {
-        cmsApi.page_list(this.param.page, this.param.size, this.param).then((res) => {
+        cmsApi.template_list(this.param.page, this.param.size, this.param).then((res) => {
           console.log(res);
           this.total = res.queryResult.total;
           this.list = res.queryResult.list;
 
         })
       },
+
+      //页码发生变动触发函数
       handleCurrentChange:function (page) {
         this.param.page = page;
         this.query();
       }
     },
 
+    //钩子方法，页面还未渲染
     created() {
       //从路由上获取参数
       this.param.page = Number.parseInt(this.$route.query.page||1);
@@ -163,6 +131,7 @@
 
     },
 
+    //钩子方法，页面已经渲染
     mounted() {
 
       //默认页面查询
